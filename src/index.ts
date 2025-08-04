@@ -1,9 +1,3 @@
-// =======================================================================
-// ARCHIVO: index.ts (Archivo principal del Backend)
-// DESCRIPCIÓN: ESTA ES LA CORRECCIÓN CLAVE. Se añade la importación y
-//              el uso de las rutas para las reseñas (resenaRoutes), que
-//              faltaban y causaban el error 404.
-// =======================================================================
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -14,9 +8,7 @@ import orderRoutes from './routes/order.routes';
 import categoriaRoutes from './routes/categoria.routes';
 import dashboardRoutes from './routes/dashboard.routes';
 import userRoutes from './routes/user.routes';
-// --- INICIO DE LA CORRECCIÓN ---
-import resenaRoutes from './routes/resena.routes'; // <-- 1. IMPORTAR LAS RUTAS
-// --- FIN DE LA CORRECCIÓN ---
+import resenaRoutes from './routes/resena.routes';
 
 dotenv.config();
 const app = express();
@@ -31,19 +23,20 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ Conectado a la base de datos MongoDB'))
   .catch((err) => console.error('❌ Error de conexión a MongoDB:', err));
 
-app.use(cors());
+const corsOptions = {
+  origin: 'https://mercadolocal-frontend.vercel.app'
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
-// Registramos las rutas en la aplicación
 app.use('/api/auth', authRoutes);
 app.use('/api/productos', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/categorias', categoriaRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/user', userRoutes);
-// --- INICIO DE LA CORRECCIÓN ---
-app.use('/api/resenas', resenaRoutes); // <-- 2. USAR LAS RUTAS
-// --- FIN DE LA CORRECCIÓN ---
+app.use('/api/resenas', resenaRoutes);
 
 app.get('/api', (req: Request, res: Response) => {
   res.send('¡API de MercadoLocal funcionando! 🚀');
