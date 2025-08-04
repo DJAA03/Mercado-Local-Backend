@@ -1,5 +1,5 @@
 import express, { Request, Response, NextFunction } from 'express';
-import cors from 'cors';
+import cors, { CorsOptions } from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import authRoutes from './routes/auth.routes';
@@ -23,16 +23,13 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ Conectado a la base de datos MongoDB'))
   .catch((err) => console.error('❌ Error de conexión a MongoDB:', err));
 
-// --- INICIO DE LA CORRECCIÓN DE CORS ---
-// Lista de orígenes permitidos
 const allowedOrigins = [
-  'https://mercadolocal-frontend.vercel.app', // Tu frontend en producción
-  'http://localhost:5173'                     // Tu frontend en desarrollo local
+  'https://mercadolocal-frontend.vercel.app',
+  'http://localhost:5173'
 ];
 
-const corsOptions = {
-  origin: function (origin, callback) {
-    // Permite peticiones sin origen (como las de Postman o apps móviles) o si el origen está en la lista
+const corsOptions: CorsOptions = {
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
@@ -42,8 +39,6 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-// --- FIN DE LA CORRECCIÓN DE CORS ---
-
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
