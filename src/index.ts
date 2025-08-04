@@ -23,11 +23,27 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ Conectado a la base de datos MongoDB'))
   .catch((err) => console.error('❌ Error de conexión a MongoDB:', err));
 
+// --- INICIO DE LA CORRECCIÓN DE CORS ---
+// Lista de orígenes permitidos
+const allowedOrigins = [
+  'https://mercadolocal-frontend.vercel.app', // Tu frontend en producción
+  'http://localhost:5173'                     // Tu frontend en desarrollo local
+];
+
 const corsOptions = {
-  origin: 'https://mercadolocal-frontend.vercel.app'
+  origin: function (origin, callback) {
+    // Permite peticiones sin origen (como las de Postman o apps móviles) o si el origen está en la lista
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
 };
 
 app.use(cors(corsOptions));
+// --- FIN DE LA CORRECCIÓN DE CORS ---
+
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
